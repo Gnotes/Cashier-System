@@ -116,8 +116,7 @@ class UsersTask {
   }
 
   static async validateUsername(username) {
-    const q = await AppDAO.get("SELECT * FROM users");
-    console.log("====>", q);
+    // const q = await AppDAO.get("SELECT * FROM users");
     const queryResult = await AppDAO.get(
       `
         SELECT username, password, disabled FROM users WHERE username=?
