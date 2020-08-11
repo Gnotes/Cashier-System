@@ -5,7 +5,7 @@
   "main": "src/index.js",
   "type": "module",
   "scripts": {
-    "dev:server": "cross-env NODE_ENV=development JWT_KEY=xiaomupossystem nodemon --experimental-modules src/index.js",
+    "dev": "cross-env NODE_ENV=development JWT_KEY=xiaomupossystem nodemon --experimental-modules src/index.js",
     "build": "cross-env NODE_ENV=production webpack --env.JWT_KEY=xiaomupossystem --config webpack.prod.cjs",
     "build:demo": "cross-env NODE_ENV=production webpack --env.JWT_KEY=xiaomupossystem --env.MODE=DEMO --config webpack.prod.cjs",
     "dev:fakedb": "cross-env NODE_ENV=development node tools/fakeData.js",
@@ -27,6 +27,11 @@
     "sqlite3": "^4.1.0"
   },
   "devDependencies": {
+    "nodemon": "^2.0.4",
+    "@babel/cli": "^7.10.5",
+    "@babel/core": "^7.11.1",
+    "@babel/preset-env": "^7.11.0",
+    "@babel/register": "^7.10.5",
     "cross-env": "^6.0.3",
     "electron-rebuild": "^1.10.1",
     "webpack": "^4.42.1",
