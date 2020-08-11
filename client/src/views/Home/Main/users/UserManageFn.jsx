@@ -7,6 +7,7 @@ const { Option } = Select;
 
 const selector = ({ userDetails }) => ({
   login_user: userDetails.username,
+  isAdmin: userDetails.isAdmin,
 });
 
 function _ChangeModal({ type, status, form, closeModal, groups, user, createUser, changeUsername, changeUserPwd, changeUserGroup, addGroup }) {
@@ -279,7 +280,7 @@ export function UserManageFn({ groups, user, ajax, createUser, changeUsername, c
     }));
   }
 
-  const { login_user } = useSelector(selector);
+  const { login_user, isAdmin } = useSelector(selector);
 
   function handleStatus() {
     const { username, disabled } = user;
@@ -297,7 +298,7 @@ export function UserManageFn({ groups, user, ajax, createUser, changeUsername, c
     });
   }
 
-  const disabled = !user;
+  const disabled = !user || !isAdmin;
 
   const status = user && user.disabled;
 
@@ -346,7 +347,7 @@ export function UserManageFn({ groups, user, ajax, createUser, changeUsername, c
       fn: handleStatus,
     },
   ];
-  console.log("-modalData->", modalData);
+
   return (
     <div className={styled["user-manage-fn"]}>
       {config.map(({ title, btnType = "primary", icon, disabled = false, fn }) => (
