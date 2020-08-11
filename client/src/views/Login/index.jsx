@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Form, Input, Button, Row, Icon, Typography, Checkbox, message as antdMessage } from "antd";
+import { Form, Input, Button, Row, Icon, Typography, message as antdMessage } from "antd";
 import { Redirect, useLocation } from "react-router-dom";
 import { useAuth } from "../AuthProvider";
 import { useAjax } from "../AjaxProvider";
@@ -130,13 +130,6 @@ function _Login({ form }) {
               ],
             })(<Input type="password" placeholder="请输入密码" prefix={<Icon type="lock" style={{ color: "rgba(0,0,0,.25)" }} />} />)}
           </Form.Item>
-          {/* <Form.Item
-                        type="flex"
-                        justify="center"
-                        className={style["login-input-fix"]}
-                    >
-                        <Checkbox>本机服务器模式</Checkbox>
-                    </Form.Item> */}
           <Form.Item type="flex" justify="center">
             <Button
               loading={isLoading}
@@ -150,7 +143,7 @@ function _Login({ form }) {
               登录
             </Button>
           </Form.Item>
-          <ConnectConfig />
+          {/* <ConnectConfig /> */}
         </Form>
       </div>
     </div>
