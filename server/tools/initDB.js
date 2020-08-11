@@ -5,27 +5,19 @@ import GroupTask from "../src/tasks/groups.js";
 import UserTask from "../src/tasks/users.js";
 import config from "../src/config/index.js";
 
-const {
-    default_admin_group_name,
-    default_pos_group_name,
-    default_supplier,
-    default_admin_username,
-    default_admin_password,
-    default_pos_username,
-    default_pos_password
-} = config;
+const { default_admin_group_name, default_pos_group_name, default_supplier, default_admin_username, default_admin_password, default_pos_username, default_pos_password } = config;
 
 async function init() {
-    const dao = AppDAO;
-    await dao.run(`
+  const dao = AppDAO;
+  await dao.run(`
     CREATE TABLE IF NOT EXISTS groups(
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         usergroup TEXT UNIQUE NOT NULL
     );
     `);
-    // 创建用户组列表
+  // 创建用户组列表
 
-    await dao.run(`
+  await dao.run(`
     CREATE TABLE IF NOT EXISTS users (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         username TEXT UNIQUE NOT NULL,
@@ -35,17 +27,17 @@ async function init() {
         FOREIGN KEY (group_id) REFERENCES groups (id)
     );
     `);
-    // 创建用户列表
+  // 创建用户列表
 
-    await dao.run(`
+  await dao.run(`
     CREATE TABLE IF NOT EXISTS authority(
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         authority TEXT UNIQUE NOT NULL
     );
     `);
-    // 创建权限列表
+  // 创建权限列表
 
-    await dao.run(`
+  await dao.run(`
     CREATE TABLE IF NOT EXISTS groups_authority(
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         usergroup_id INTEGER NOT NULL,
@@ -54,62 +46,69 @@ async function init() {
         FOREIGN KEY (authority_id) REFERENCES authority (id)
     );
     `);
-    // 创建用户组-权限一对一列表
+  // 创建用户组-权限一对一列表
 
-    await Promise.all(
-        moduleList.map(item =>
-            dao.run(`
+  await Promise.all(
+    moduleList.map((item) =>
+      dao.run(`
         INSERT INTO authority (authority) VALUES ("${item}")
         ;`)
-        )
-    );
-    // 填充权限表
+    )
+  );
+  // 填充权限表
 
-
-    const authorityIDList = (await dao.all(`
+  const authorityIDList = (await dao.all(`
     SELECT id FROM authority
     ;`)).map(({ id }) => id);
-    await GroupTask.createGroup(default_admin_group_name, authorityIDList);
-    // 创建默认管理员群组
-    // 填充默认管理员群组权限
+  await GroupTask.createGroup(default_admin_group_name, authorityIDList);
+  // 创建默认管理员群组
+  // 填充默认管理员群组权限
 
-    const hash = await genHash(default_admin_password);
-    const { id: group_id } = await dao.get(`
+  const hash = await genHash(default_admin_password);
+  const { id: group_id } = await dao.get(`
     SELECT id FROM groups WHERE usergroup="${default_admin_group_name}"
     ;`);
-    await UserTask.createUser(default_admin_username, hash, group_id);
-    // 创建默认管理员
+  await UserTask.createUser(default_admin_username, hash, group_id);
+  // 创建默认管理员
 
-    const posAuthorityIdList = await Promise.all(posModuleList.map(async i => (
-        await dao.get(`
+  const posAuthorityIdList = await Promise.all(
+    posModuleList.map(
+      async (i) =>
+        await dao.get(
+          `
         SELECT id FROM authority WHERE authority=?
-        ;`, i)
-    )));
-    // 默认收银员组权限ID列表
+        ;`,
+          i
+        )
+    )
+  );
 
-    await GroupTask.createGroup(default_pos_group_name, posAuthorityIdList);
-    // 创建默认收银员组
+  // 默认收银员组权限ID列表
 
-    const posHash = await genHash(default_pos_password);
-    const { id: pos_group_id } = await dao.get(`
+  await GroupTask.createGroup(default_pos_group_name, posAuthorityIdList);
+  // 创建默认收银员组
+
+  const posHash = await genHash(default_pos_password);
+  const { id: pos_group_id } = await dao.get(
+    `
     SELECT id FROM groups WHERE usergroup=?
-    ;`, default_pos_group_name);
+    ;`,
+    default_pos_group_name
+  );
 
-    await UserTask.createUser(default_pos_username, posHash, pos_group_id);
-    // 创建默认收银员
+  await UserTask.createUser(default_pos_username, posHash, pos_group_id);
+  // 创建默认收银员
 
-
-
-    await dao.run(`
+  await dao.run(`
     CREATE TABLE IF NOT EXISTS categories (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT UNIQUE NOT NULL,
         parent_id INTEGER
     )
     ;`);
-    // 创建商品分类表
+  // 创建商品分类表
 
-    await dao.run(`
+  await dao.run(`
     CREATE TABLE IF NOT EXISTS commodity (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         barcode TEXT UNIQUE NOT NULL,
@@ -130,17 +129,17 @@ async function init() {
         FOREIGN KEY (category_id) REFERENCES categories (id)
     )
     ;`);
-    // 创建商品表
+  // 创建商品表
 
-    await dao.run(`
+  await dao.run(`
     CREATE TABLE IF NOT EXISTS custom_barcode (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT NOT NULL
     )
     ;`);
-    // 创建自定义条码占位表
+  // 创建自定义条码占位表
 
-    await dao.run(`
+  await dao.run(`
     CREATE TABLE IF NOT EXISTS commodity_snapshot (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         create_time INTEGER NOT NULL,
@@ -164,9 +163,9 @@ async function init() {
         (id)
     )
     ;`);
-    // 创建商品历史信息表
+  // 创建商品历史信息表
 
-    await dao.run(`
+  await dao.run(`
     CREATE TABLE IF NOT EXISTS suppliers (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT UNIQUE NOT NULL,
@@ -174,46 +173,55 @@ async function init() {
         description TEXT
     )
     ;`);
-    // 创建供货商信息表
+  // 创建供货商信息表
 
-    await dao.run(`
+  await dao.run(
+    `
     INSERT INTO suppliers 
     (name, phone, description) 
     VALUES (?, ?, ?)
-    ;`, [default_supplier, "", "默认供应商"]);
-    // 创建默认供货商
+    ;`,
+    [default_supplier, "", "默认供应商"]
+  );
+  // 创建默认供货商
 
-    await dao.run(`
+  await dao.run(`
     CREATE TABLE IF NOT EXISTS vip_type (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT UNIQUE NOT NULL
     )
     ;`);
-    // 创建会员卡类型表
+  // 创建会员卡类型表
 
-    await dao.run(`
+  await dao.run(
+    `
     INSERT INTO vip_type 
     (name) 
     VALUES (?)
-    ;`, ["积分卡"]);
-    // 创建积分卡类型
+    ;`,
+    ["积分卡"]
+  );
+  // 创建积分卡类型
 
-    await dao.run(`
+  await dao.run(`
     CREATE TABLE IF NOT EXISTS vip_score_rules (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         money INTEGER NOT NULL DEFAULT 1 CHECK (money >= 1),
         point INTEGER NOT NULL DEFAULT 1 CHECK (point >= 1)
     )
     ;`);
-    // 创建积分卡规则表，设置每多少元消费等于多少积分
+  // 创建积分卡规则表，设置每多少元消费等于多少积分
 
-    await dao.run(`
+  await dao.run(
+    `
     INSERT INTO vip_score_rules 
     (money, point) 
     VALUES (?, ?)
-    ;`, [1, 10]);
+    ;`,
+    [1, 10]
+  );
 
-    await dao.run(`
+  await dao.run(`
     CREATE TABLE IF NOT EXISTS vip_info (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         code TEXT NOT NULL UNIQUE,
@@ -229,9 +237,9 @@ async function init() {
         FOREIGN KEY (type_id) REFERENCES vip_type (id)
     )
     ;`);
-    // 创建会员列表
+  // 创建会员列表
 
-    await dao.run(`
+  await dao.run(`
     CREATE TABLE IF NOT EXISTS vip_info_snapshot (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         vip_member_id INTEGER NOT NULL,
@@ -248,9 +256,9 @@ async function init() {
         FOREIGN KEY (vip_member_id) REFERENCES vip_info (id)
     )
     ;`);
-    // 创建会员信息快照列表
+  // 创建会员信息快照列表
 
-    await dao.run(`
+  await dao.run(`
     CREATE TABLE IF NOT EXISTS vip_value (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         vip_id INTEGER NOT NULL UNIQUE,
@@ -260,9 +268,9 @@ async function init() {
         FOREIGN KEY (vip_id) REFERENCES vip_info (id)
     )
     ;`);
-    // 记录会员积分等信息
+  // 记录会员积分等信息
 
-    await dao.run(`
+  await dao.run(`
     CREATE TABLE IF NOT EXISTS vip_change (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         old_code_id INTEGER NOT NULL UNIQUE,
@@ -273,9 +281,9 @@ async function init() {
         FOREIGN KEY (new_code_id) REFERENCES vip_info (id)
     )
     ;`);
-    // 记录会员补换卡记录
+  // 记录会员补换卡记录
 
-    await dao.run(`
+  await dao.run(`
     CREATE TABLE IF NOT EXISTS promotion (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT NOT NULL UNIQUE,
@@ -284,27 +292,32 @@ async function init() {
         description TEXT
     )
     ;`);
-    // 促销活动表
+  // 促销活动表
 
-    await dao.run(`
+  await dao.run(`
     CREATE TABLE IF NOT EXISTS promotion_type (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT NOT NULL UNIQUE
     )
     ;`);
 
-    const type_list = ["单品特价", "单品打折"];
+  const type_list = ["单品特价", "单品打折"];
 
-
-    await Promise.all(type_list.map(async key =>
-        await dao.run(`
+  await Promise.all(
+    type_list.map(
+      async (key) =>
+        await dao.run(
+          `
         INSERT INTO promotion_type 
         (name) 
         VALUES (?)
-        ;`, key)
-    ));
+        ;`,
+          key
+        )
+    )
+  );
 
-    await dao.run(`
+  await dao.run(`
     CREATE TABLE IF NOT EXISTS promotion_details (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         promotion_id INTEGER NOT NULL,
@@ -315,9 +328,9 @@ async function init() {
         FOREIGN KEY (promotion_type_id) REFERENCES promotion_type (id)
     )
     ;`);
-    // 参加促销活动的商品详情
+  // 参加促销活动的商品详情
 
-    await dao.run(`
+  await dao.run(`
     CREATE TABLE IF NOT EXISTS stock (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         supplier_id INTERGER NOT NULL,
@@ -326,9 +339,9 @@ async function init() {
         FOREIGN KEY (supplier_id) REFERENCES suppliers (id)
     )
     ;`);
-    // 创建进货记录
+  // 创建进货记录
 
-    await dao.run(`
+  await dao.run(`
     CREATE TABLE IF NOT EXISTS stock_details (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         stock_id INTEGER NOT NULL,
@@ -339,9 +352,9 @@ async function init() {
         FOREIGN KEY (commodity_id) REFERENCES commodity (id)
     )
     ;`);
-    // 进货单详情
+  // 进货单详情
 
-    await dao.run(`
+  await dao.run(`
     CREATE TABLE IF NOT EXISTS orders (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         order_id INTEGER NOT NULL UNIQUE,
@@ -362,9 +375,9 @@ async function init() {
         FOREIGN KEY (user_id) REFERENCES users (id)
     )
     ;`);
-    // 创建订单表
+  // 创建订单表
 
-    await dao.run(`
+  await dao.run(`
     CREATE TABLE IF NOT EXISTS order_details (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         order_id INTEGER NOT NULL,
@@ -378,28 +391,28 @@ async function init() {
         FOREIGN KEY (order_id) REFERENCES orders (order_id)
     )
     ;`);
-    // 订单详情
+  // 订单详情
 
-    await dao.run(`
+  await dao.run(`
     CREATE TABLE IF NOT EXISTS serial_number (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         timestamp INTEGER NOT NULL UNIQUE
     )
     ;`);
-    // 每日的临时流水号生成
+  // 每日的临时流水号生成
 
-    await dao.run(`
+  await dao.run(`
     CREATE TABLE IF NOT EXISTS store_config (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT NOT NULL DEFAULT "小牧超市"
     )
     ;`);
 
-    await dao.run(`
+  await dao.run(`
     INSERT INTO store_config (name) VALUES ("小牧超市")
     ;`);
 
-    AppDAO.close();
+  AppDAO.close();
 }
 
 init();
