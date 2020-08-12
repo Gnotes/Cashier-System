@@ -4,21 +4,39 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  &::after {
+    content: "";
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    left: 0;
+    top: 0;
+    background: inherit;
+    filter: drop-shadow(8px 8px 10px #000) hue-rotate(500deg) grayscale(0.3) invert(0.2) brightness(1.2);
+  }
+
   .login-wrapper {
     background-color: #fff;
-    width: 320px;
+    width: 520px;
+    border-radius: 4px;
+    padding: 30px 20px;
+    box-shadow: 0 0 5px 0 #f7efef;
+    z-index: 999;
 
     .title-wrap {
       position: relative;
       .logo {
         position: absolute;
         width: 40px;
-        top: 12px;
+        top: 14px;
         bottom: 0;
-        left: 42px;
+        left: 92px;
       }
       .login-title {
         margin: 20px 0;
+        font-size: 20px;
         color: #000;
         font-weight: bold;
       }

@@ -4,8 +4,8 @@ import { Redirect, useLocation } from "react-router-dom";
 import { useAuth } from "../AuthProvider";
 import { useAjax } from "../AjaxProvider";
 import style from "../../styles/login.scss";
-import { ConnectConfig } from "./ConnectConfig";
 import logo from "../../styles/images/logo.png";
+import backgroundBg from "../../styles/images/bg-login-cartoon.jpeg";
 
 const { Text } = Typography;
 
@@ -95,7 +95,12 @@ function _Login({ form }) {
   }
 
   return (
-    <div className={style["login-bg"]}>
+    <div
+      className={style["login-bg"]}
+      style={{
+        backgroundImage: `url(${backgroundBg})`,
+      }}
+    >
       <div className={style["login-wrapper"]}>
         <Row type="flex" justify="center" className={style["title-wrap"]}>
           <img src={logo} alt="" className={style["logo"]} />
