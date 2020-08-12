@@ -170,6 +170,7 @@ async function init() {
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT UNIQUE NOT NULL,
         phone TEXT,
+        phone2 TEXT,
         description TEXT
     )
     ;`);
@@ -178,8 +179,8 @@ async function init() {
   await dao.run(
     `
     INSERT INTO suppliers 
-    (name, phone, description) 
-    VALUES (?, ?, ?)
+    (name, phone, phone2, description) 
+    VALUES (?, ?, ?, ?)
     ;`,
     [default_supplier, "", "默认供应商"]
   );
