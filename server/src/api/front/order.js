@@ -3,6 +3,7 @@ import { throwError } from "../../middleware/handleError.js";
 import { validBody } from "../../middleware/validBody.js";
 import { createOrderSchema, undoOrderSchema, addOrderVipSchema } from "../../schema/orders.js";
 import OrdersTask from "../../tasks/frontend/orders.js";
+import CommodityTask from "../../tasks/commodity.js";
 import VipTask from "../../tasks/vip.js";
 
 const route = express.Router();
@@ -14,6 +15,17 @@ route.post("/submit", validBody(
     // 创建新的订单
 
     const { pay_type, client_pay, change, origin_price, sale_price, commodity_list, vip_code, count } = req.body;
+    
+    for (let item of commodity_list) {
+        const result = await CommodityTask.checkCommodityCountByBarcode(item.barcode)
+        // 有任何分类不存在直接返回400
+        if (!result) {
+          return throwError(next, `编号"${item.barcode}"的商品不存在!`);
+        }
+        if(result.count < item.count){
+            return throwError(next, `商品"${result.name}"库存不足，剩余: ${result.count}`);
+        }
+    }
 
     const priceIsEqual = await OrdersTask.validOrderPrice(sale_price, commodity_list);
     // 验证前台提交的商品总金额和商品数量*单价总数是否相符
@@ -33,6 +45,10 @@ route.post("/submit", validBody(
     const { status, data } = await OrdersTask.handleOrder({
         pay_type, client_pay, change, origin_price, sale_price, commodity_list, username, vip_code, count
     });
+
+    await Promise.all(commodity_list.map((commodity)=>{
+        return CommodityTask.updateCommodifyCountByBarcode(commodity.barcode, -new Number(commodity.count))
+    }))
 
     if (!status) {
         return throwError(next, data);

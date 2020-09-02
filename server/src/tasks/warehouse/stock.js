@@ -93,11 +93,13 @@ class StockTask {
         // 设置进货单的商品
 
         return await Promise.all(list.map(async ({ commodity_id, count, in_price }) => {
-            return await AppDAO.run(`
+            await AppDAO.run(`
             INSERT INTO stock_details 
             (stock_id, commodity_id, count, in_price) 
             VALUES (?, ?, ?, ?)
             ;`, [stock_id, commodity_id, count, in_price]);
+            
+            return  CommodityTask.updateCommodifyCount(commodity_id, count);
         }))
     }
 }

@@ -482,6 +482,42 @@ class CommodityTask {
         WHERE commodity_ID=?
         ;`, id);
     }
+
+    static async checkCommodityCountByBarcode(barcode){
+        // 检查库存
+        return await AppDAO.get(`
+        SELECT name, count FROM commodity 
+        WHERE barcode=?
+        ;`, barcode);
+    }
+   
+    static async checkCommodityCount(id){
+        // 检查库存
+        return await AppDAO.get(`
+        SELECT count FROM commodity 
+        WHERE id=?
+        ;`, id);
+    }
+
+    static async updateCommodifyCount(id, countChange){
+        const commodity = await this.checkCommodityCount(id);
+        const afterCount = commodity.count + countChange;
+        return await AppDAO.run(`
+        UPDATE commodity 
+        SET count=? 
+        WHERE id=?
+        ;`, [afterCount, id]);
+    }
+
+    static async updateCommodifyCountByBarcode(barcode, countChange){
+        const commodity = await this.checkCommodityCountByBarcode(barcode);
+        const afterCount = commodity.count + countChange;
+        return await AppDAO.run(`
+        UPDATE commodity 
+        SET count=? 
+        WHERE barcode=?
+        ;`, [afterCount, barcode]);
+    }
 }
 
 export default CommodityTask;
