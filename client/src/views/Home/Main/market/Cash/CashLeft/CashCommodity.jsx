@@ -57,6 +57,11 @@ export const columns = [
         type: 3
     },
     {
+        title: "库存",
+        key: "storeCount",
+        type: 3
+    },
+    {
         title: "金额",
         key: "money",
         type: 3

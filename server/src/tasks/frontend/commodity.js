@@ -10,7 +10,7 @@ class CommodityTask {
         const query_fields = ["barcode", "pinyin", "name"]
         // 分别从条码、拼音首字母缩写、名称来查询
 
-        const front_field_list = ["id", "barcode", "name", "unit", "size", "sale_price", "vip_points", "is_delete"];
+        const front_field_list = ["id", "barcode", "name", "unit", "size","count", "sale_price", "vip_points", "is_delete"];
         // 前台进行销售时需要的字段
 
         const ware_field_list = ["id", "barcode", "category_id", "name", "in_price", "sale_price", "is_delete"];

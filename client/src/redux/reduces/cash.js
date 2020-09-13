@@ -77,6 +77,7 @@ function currentOrder(state = orderInit, action) {
                     Object.assign({}, action.commodity, {
                         id: state.id + 1,
                         count: 1,
+                        storeCount:action.commodity.count,
                         money: action.commodity.sale_price
                     })
                 ],
